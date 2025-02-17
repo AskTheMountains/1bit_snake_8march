@@ -1,0 +1,35 @@
+/* Подключаем шрифт */
+@font-face {
+  font-family: 'PixelFont';
+  src: url('./src/font/pixel_font.otf') format('opentype');
+  font-style: normal;
+  font-weight: normal;
+}
+/* Общие стили для страницы */
+body {
+  font-family: 'PixelFont', sans-serif; /* Подключаем шрифт */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+}
+
+/* Контейнер для игры */
+#game-container {
+  text-align: center;
+}
+
+/* Игровое поле */
+#game-canvas {
+  display: block;
+  background-color: #eaeaea; /* Светло-серый фон */
+  border: 1px solid #000; /* Чёрная рамка вокруг игрового поля */
+}
+
+/* Инструкции под игрой */
+#controls {
+  margin-top: 10px;
+}

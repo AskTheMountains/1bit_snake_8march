@@ -117,26 +117,29 @@ function render() {
   // Рисуем змею
   snake.forEach((segment, index) => {
     if (index === 0) {
+	  // Голову змейки не вращаем, рисуем обычным методом
       ctx.drawImage(snakeHeadImg, segment.x * tileSize, segment.y * tileSize, tileSize, tileSize);
     } else {
-      let angle = 0;
+	   // Вычисляем направление текущего сегмента относительно следующего
+      let angle = 0; // Угол по умолчанию
 
-      const prevSegment = snake[index - 1];
+      const prevSegment = snake[index - 1];  //Предыдущий сегмент
       if (prevSegment) {
-        const dx = segment.x - prevSegment.x;
-        const dy = segment.y - prevSegment.y;
-
-        if (dx === 1) angle = Math.PI / 2;
-        else if (dx === -1) angle = -Math.PI / 2;
-        else if (dy === 1) angle = Math.PI;
-        else if (dy === -1) angle = 0;
+        const dx = segment.x - prevSegment.x; // Разница по x
+        const dy = segment.y - prevSegment.y; // Разница по y
+        // Вычисляем угол вращения на основе направления
+        if (dx === 1) angle = Math.PI / 2; // Сегмент идет вправо
+        else if (dx === -1) angle = -Math.PI / 2; // Сегмент идет влево
+        else if (dy === 1) angle = Math.PI; // Сегмент идет вниз
+        else if (dy === -1) angle = 0; // Сегмент идет вверх
       }
 
-      ctx.save(); 
-      ctx.translate(segment.x * tileSize + tileSize / 2, segment.y * tileSize + tileSize / 2);
-      ctx.rotate(angle);
-	  ctx.drawImage(snakeBodyImg, -tileSize / 2, -tileSize / 2, tileSize, tileSize);
-      ctx.restore();
+      // Поворачиваем и рисуем текстуру для этого сегмента
+      ctx.save(); // Сохраняем состояние холста
+      ctx.translate(segment.x * tileSize + tileSize / 2, segment.y * tileSize + tileSize / 2); // Перемещаем в центр сегмента
+      ctx.rotate(angle); // Поворачиваем холст
+      ctx.drawImage(snakeBodyImg, -tileSize / 2, -tileSize / 2, tileSize, tileSize); // Рисуем тело
+      ctx.restore(); // Восстанавливаем состояние холста
     }
   });
 }
@@ -176,7 +179,7 @@ function initializeGame() {
       requestAnimationFrame(gameLoop); // Запускаем игровой цикл 
     }
     else {
-      alert('Пожалуйста, введите ваше имя!');
+      alert('Пожалуйста, введите ваш никнейм, чтобы продолжить');
     }
   }
 }

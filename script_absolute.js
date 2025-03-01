@@ -3,8 +3,8 @@ let canvas = document.getElementById('game-canvas');
 if (!canvas) {
     canvas = document.createElement('canvas');
     canvas.id = 'game-canvas';
-    canvas.width = 400;
-    canvas.height = 400;
+    canvas.width = 450;
+    canvas.height = 450;
     document.body.appendChild(canvas);
 }
 
@@ -30,7 +30,7 @@ let food = { x: 5, y: 5 };
 let speed = 20;
 
 // Логика для выигрыша
-const victoryLength = 3;
+const victoryLength = 1;
 
 // Счётчик времени
 let frame = 0;
@@ -266,104 +266,106 @@ function showVictory() {
   }
 
   document.body.innerHTML = `
-    <div id="victory-screen" style="position: relative; text-align: center; background-color: #add8e6; 
-    width: 100vw; max-width: 100%; height: 100vh; overflow: hidden;">
+  <div id="victory-screen" style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; background-color: #add8e6; width: 100vw; height: 100vh; overflow: hidden; position: relative;">
+    <div style="position: relative; width: 100%; flex-grow: 1; margin-top: 20px;">
       <img src="./src/images/sun1.gif" alt="Солнышко" style="position: absolute; top: 10px; right: 10px; width: 150px; height: 150px; z-index: 1;">
-	  <!--
-	  <h1 style="font-family: 'PixelFont'; color: pink; text-shadow: 2px 2px black; margin-top: 180px;">
-      -->
-	  <h1 style="font-family: 'PixelFont'; color: pink; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px  1px 0 #000, 1px  1px 0 #000; black; margin-top: 180px;">
-		Дорогие девушки, поздравляем с 8 марта <3
+      <h1 style="font-family: 'PixelFont'; color: pink; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px  1px 0 #000, 1px  1px 0 #000; margin: 0; padding-top: 200px;">
+        Дорогие девушки, поздравляем с 8 марта <3
       </h1>
-      <p style="font-family: 'PixelFont'; color: #333; font-size: 18px;">
+      <p style="font-family: 'PixelFont'; color: #333; font-size: 18px; margin: 10px 0;">
         Ваш подарок ждёт вас:
       </p>
       ${victoryContent}
-      <img src="./src/images/grass.png" alt="Трава" style="width: 100%; height: auto; max-height: 130px; position: absolute; bottom: 0; left: 0; z-index: 1">
-      <img src="./src/images/rose.png" alt="Роза" style="position: absolute; top: 79%; left: 50%; transform: translate(-50%, -50%) scale(0.3); z-index: 0">
-      <img src="./src/images/flower1.gif" alt="Цветы1" style="position: absolute; bottom: 0.5%; left: 10%; transform: translateX(-50%) scale(0.6); z-index: 2">
-      <img src="./src/images/flower3.gif" alt="Цветы3" style="position: absolute; bottom: 2.5%; left: 30%; transform: translateX(-50%) scale(0.6); z-index: 0">
-      <img src="./src/images/flower3.gif" alt="Цветы3" style="position: absolute; bottom: 2.5%; left: 65%; transform: translateX(-50%) scale(0.6); z-index: 0">
-	  <img src="./src/images/flower2.gif" alt="Цветы2" style="position: absolute; bottom: 0.0%; left: 78%; transform: translateX(-50%) scale(0.57); z-index:0;">
-      <img src="./src/images/tree1.gif" alt="Деревце1" style="position: absolute; bottom: 23%; left: 96%; transform: translateX(-50%) scale(3); z-index: 0">
+    </div>
+    <div style="position: relative; width: 100%; height: 130px; flex-shrink: 0;">
+      <img src="./src/images/grass.png" alt="Трава" style="width: 100%; height: 100%; position: absolute; bottom: 0; left: 0; z-index: 1">
+      <img src="./src/images/rose.png" alt="Роза" style="position: absolute; bottom: -260%; left: 50%; transform: translateX(-50%) scale(0.25); z-index: 0;">
+      <img src="./src/images/flower1.gif" alt="Цветы1" style="position: absolute; bottom: 0.5%; left: 10%; transform: translateX(-50%) scale(0.6); z-index: 2;">
+      <img src="./src/images/flower3.gif" alt="Цветы3" style="position: absolute; bottom: 15%; left: 33%; transform: translateX(-50%) scale(0.6); z-index: 0;">
+      <img src="./src/images/flower3.gif" alt="Цветы3" style="position: absolute; bottom: 15%; left: 65%; transform: translateX(-50%) scale(0.6); z-index: 0;">
+      <img src="./src/images/flower2.gif" alt="Цветы2" style="position: absolute; bottom: 0.0%; left: 78%; transform: translateX(-50%) scale(0.57); z-index:0;">
+      <img src="./src/images/tree1.gif" alt="Деревце1" style="position: absolute; bottom: 145%; left: 95%; transform: translateX(-50%) scale(3); z-index: 0;">
+    </div>
+  </div>
   `;
 
-  // Контейнер для облаков
-  const cloudContainer = document.getElementById('victory-screen');
-  
-  let lastCloudType = null; // Последний использованный тип облака
+// Контейнер для облаков
+const cloudContainer = document.getElementById('victory-screen');
 
-  // Генерируем облака
-  for (let i = 0; i < 10; i++) {
-    const cloud = document.createElement('div');
+let lastCloudType = null; // Последний использованный тип облака
 
-    // Выбираем случайный тип облака
-    let cloudType;
-    do {
-      cloudType = `cloud${Math.floor(Math.random() * 3) + 1}`;
-    } while (cloudType === lastCloudType);
-    lastCloudType = cloudType;
+// Генерируем облака
+for (let i = 0; i < 10; i++) {
+  const cloud = document.createElement('div');
 
-    // Присваиваем случайно выбранный тип облака
-    cloud.className = `cloud ${cloudType}`;
+  // Выбираем случайный тип облака
+  let cloudType;
+  do {
+    cloudType = `cloud${Math.floor(Math.random() * 3) + 1}`;
+  } while (cloudType === lastCloudType);
+  lastCloudType = cloudType;
 
-    // Добавляем случайные параметры
-    cloud.style.top = `${Math.random() * 80 + 20}px`; // Высота 20-100px
-    cloud.style.animationDelay = `${Math.random() * 5}s`; // Задержка 0-5s
-    cloud.style.animationDuration = `${Math.random() * 5 + 15}s`; // Длительность 15-20s
-    const randomScale = Math.random() * 0.4 + 0.8; // 0.8 <= scale < 1.2
-    cloud.style.transform = `scale(${randomScale})`;
-    cloud.style.zIndex = 10; 
-    cloudContainer.appendChild(cloud);
+  // Присваиваем случайно выбранный тип облака
+  cloud.className = `cloud ${cloudType}`;
+
+  // Добавляем случайные параметры
+  cloud.style.top = `${Math.random() * 80 + 20}px`; // Высота 20-100px
+  cloud.style.animationDelay = `${Math.random() * 5}s`; // Задержка 0-5s
+  cloud.style.animationDuration = `${Math.random() * 5 + 15}s`; // Длительность 15-20s
+  const randomScale = Math.random() * 0.4 + 0.8; // 0.8 <= scale < 1.2
+  cloud.style.transform = `scale(${randomScale})`;
+  cloud.style.zIndex = 10; 
+  cloudContainer.appendChild(cloud);
+}
+
+const style = document.createElement('style');
+style.innerHTML = `
+  .cloud {
+    position: absolute;
+    background-repeat: no-repeat;
+    background-size: contain;
+    animation: moveClouds linear infinite;
+    left: -300px;
+    opacity: 0;
   }
-  
-  const style = document.createElement('style');
-  style.innerHTML = `
-    .cloud {
-      position: absolute;
-      background-repeat: no-repeat;
-      background-size: contain;
-      animation: moveClouds linear infinite;
-      left: -300px;
-      opacity: 0;
-    }
 
-    .cloud1 {
-      width: 150px;
-      height: 75px;
-      background-image: url('./src/images/cloud1.png');
-    }
+  .cloud1 {
+    width: 150px;
+    height: 75px;
+    background-image: url('./src/images/cloud1.png');
+  }
 
-    .cloud2 {
-      width: 150px;
-      height: 75px;
-      background-image: url('./src/images/cloud2.png');
-    }
+  .cloud2 {
+    width: 150px;
+    height: 75px;
+    background-image: url('./src/images/cloud2.png');
+  }
 
-    .cloud3 {
-      width: 400px;
-      height: 200px;
-      background-image: url('./src/images/cloud3.gif');
-    }
+  .cloud3 {
+    width: 400px;
+    height: 200px;
+    background-image: url('./src/images/cloud3.gif');
+  }
 
-    @keyframes moveClouds {
-      0% {
-        left: -300px;
-        opacity: 0;
-      }
-      10% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 1;
-      }
-      100% {
-        left: 100vw;
-        opacity: 0;
-      }
-    }
-  `;
-  document.head.appendChild(style);
+  @keyframes moveClouds {
+    0% {
+	left: -300px;
+		  opacity: 0;
+		}
+	10% {
+		  opacity: 1;
+		}
+	50% {
+		  opacity: 1;
+		}
+	100% {
+		  left: 100vw;
+		  opacity: 0;
+		}
+	  }
+	`;
+document.head.appendChild(style);
+
 }
 
 // Экран поражения с возможностью изменения имени пользователя

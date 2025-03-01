@@ -309,49 +309,6 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-// Сенсорное управление
-let touchStartX = 0; // Начальная координата X касания
-let touchStartY = 0; // Начальная координата Y касания
-let touchEndX = 0;   // Конечная координата X касания
-let touchEndY = 0;   // Конечная координата Y касания
-
-// Функция для фиксации начала свайпа
-function handleTouchStart(event) {
-  touchStartX = event.touches[0].clientX; // Сохраняем начальную координату X
-  touchStartY = event.touches[0].clientY; // Сохраняем начальную координату Y
-}
-
-// Функция для фиксации конца свайпа
-function handleTouchEnd(event) {
-  touchEndX = event.changedTouches[0].clientX; // Записываем конечную координату X
-  touchEndY = event.changedTouches[0].clientY; // Записываем конечную координату Y
-
-  // Вычисляем разницу по X и Y
-  const deltaX = touchEndX - touchStartX;
-  const deltaY = touchEndY - touchStartY;
-
-  // Проверяем направление свайпа
-  if (Math.abs(deltaX) > Math.abs(deltaY)) {
-    // Горизонтальный свайп
-    if (deltaX > 0 && direction.x === 0) {
-      newDirection = { x: 1, y: 0 }; // Вправо
-    } else if (deltaX < 0 && direction.x === 0) {
-      newDirection = { x: -1, y: 0 }; // Влево
-    }
-  } else {
-    // Вертикальный свайп
-    if (deltaY > 0 && direction.y === 0) {
-      newDirection = { x: 0, y: 1 }; // Вниз
-    } else if (deltaY < 0 && direction.y === 0) {
-      newDirection = { x: 0, y: -1 }; // Вверх
-    }
-  }
-}
-
-// Привязываем события сенсорного управления
-document.addEventListener('touchstart', handleTouchStart, false);
-document.addEventListener('touchend', handleTouchEnd, false);
-
 // Старт игры
 placeFood();
 requestAnimationFrame(gameLoop);

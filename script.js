@@ -1,5 +1,10 @@
-// Холст для рисования
-const canvas = document.getElementById('game-canvas');
+// Создаем или получаем объект canvas
+let canvas = document.createElement('canvas');
+canvas.id = 'game-canvas';
+canvas.width = 500;  // Устанавливаем ваши размеры
+canvas.height = 500;
+document.body.appendChild(canvas);
+
 const ctx = canvas.getContext('2d');
 
 // Размеры поля
@@ -22,10 +27,20 @@ let food = { x: 5, y: 5 };
 let speed = 20;
 
 // Логика для выигрыша
-const victoryLength = 15;
+const victoryLength = 5;
 
 // Счётчик времени
 let frame = 0;
+
+// Список пользователей и соответствующих им ссылок
+const userLinks = {
+  "User1": "https://vk.com",
+  "User2": "https://user2.com",
+  "User3": "https://user3.com"
+};
+
+// Переменная для хранения текущего имени пользователя
+let currentUsername = '';
 
 // Функция старта игры
 function gameLoop() {
@@ -102,30 +117,26 @@ function render() {
   // Рисуем змею
   snake.forEach((segment, index) => {
     if (index === 0) {
-      // Голову змейки не вращаем, рисуем обычным методом
       ctx.drawImage(snakeHeadImg, segment.x * tileSize, segment.y * tileSize, tileSize, tileSize);
     } else {
-      // Вычисляем направление текущего сегмента относительно следующего
-      let angle = 0; // Угол по умолчанию
-      
-      const prevSegment = snake[index - 1]; // Предыдущий сегмент
-      if (prevSegment) {
-        const dx = segment.x - prevSegment.x; // Разница по x
-        const dy = segment.y - prevSegment.y; // Разница по y
+      let angle = 0;
 
-        // Вычисляем угол вращения на основе направления
-        if (dx === 1) angle = Math.PI / 2; // Сегмент идет вправо
-        else if (dx === -1) angle = -Math.PI / 2; // Сегмент идет влево
-        else if (dy === 1) angle = Math.PI; // Сегмент идет вниз
-        else if (dy === -1) angle = 0; // Сегмент идет вверх
+      const prevSegment = snake[index - 1];
+      if (prevSegment) {
+        const dx = segment.x - prevSegment.x;
+        const dy = segment.y - prevSegment.y;
+
+        if (dx === 1) angle = Math.PI / 2;
+        else if (dx === -1) angle = -Math.PI / 2;
+        else if (dy === 1) angle = Math.PI;
+        else if (dy === -1) angle = 0;
       }
 
-      // Поворачиваем и рисуем текстуру для этого сегмента
-      ctx.save(); // Сохраняем состояние холста
-      ctx.translate(segment.x * tileSize + tileSize / 2, segment.y * tileSize + tileSize / 2); // Перемещаем в центр сегмента
-      ctx.rotate(angle); // Поворачиваем холст
-      ctx.drawImage(snakeBodyImg, -tileSize / 2, -tileSize / 2, tileSize, tileSize); // Рисуем тело
-      ctx.restore(); // Восстанавливаем состояние холста
+      ctx.save(); 
+      ctx.translate(segment.x * tileSize + tileSize / 2, segment.y * tileSize + tileSize / 2);
+      ctx.rotate(angle);
+	  ctx.drawImage(snakeBodyImg, -tileSize / 2, -tileSize / 2, tileSize, tileSize);
+      ctx.restore();
     }
   });
 }
@@ -136,52 +147,87 @@ function placeFood() {
   food.y = Math.floor(Math.random() * tileCount);
 }
 
-// Проверка конца игры
-function isGameOver() {
-  const head = snake[0];
+// Добавим функцию ввода имени
+function showEnterName() {
+  document.body.innerHTML = `
+    <div id="name-entry-container" style="display: flex; flex-direction: column; justify-content: center; align-items: center; 
+      position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #555555; color: white;">
+      <h1 style="font-family: 'PixelFont'; font-size: 2em; color: #ffffff; text-shadow: 3px 3px 3px black; margin-bottom: 20px;">
+        Введите имя пользователя Telegramm
+      </h1>
+      <input id="username-input" type="text" style="font-size: 1.5em; padding: 10px; width: 300px; margin-bottom: 20px;" placeholder="Никнейм Telegramm">
+      <button onclick="initializeGame()" style="font-family: 'PixelFont'; font-size: 1.2em; padding: 10px 20px; 
+        background-color: #ff4d4d; color: white; border: none; cursor: pointer; border-radius: 5px;">
+        Начать игру
+      </button>
+      <img src="./src/images/snake_title5.gif" alt="Змейка при вводе никнейма" 
+        style="position: absolute; top: 50px; left: 50%; transform: translateX(-50%) scaleX(-1); width: 300px; opacity: 0.8;">
+    </div>
+  `;
+}
 
-  // Проверка: выход за границы поля
-  if (head.x < 0 || head.y < 0 || head.x >= tileCount || head.y >= tileCount) {
-    return true;
-  }
-
-  // Проверка: столкновение с телом змейки
-  for (let i = 1; i < snake.length; i++) {
-    if (head.x === snake[i].x && head.y === snake[i].y) {
-      return true;
+// Старт игры после ввода имени
+function initializeGame() {
+  const usernameInput = document.getElementById('username-input');
+  if (usernameInput) {
+    currentUsername = usernameInput.value.trim();
+    if (currentUsername) {
+      setupCanvas();
+      requestAnimationFrame(gameLoop); // Запускаем игровой цикл 
+    }
+    else {
+      alert('Пожалуйста, введите ваше имя!');
     }
   }
+}
 
-  return false;
+// Устанавливаем холст игры
+function setupCanvas() {
+  // Удаляем id, чтобы легче было на шаблоне html вставить в будущем
+  document.body.innerHTML = ``;
+  document.body.appendChild(canvas);
 }
 
 // Показ экрана победы
 function showVictory() {
+  let victoryContent;
+
+  if (userLinks[currentUsername]) {
+    victoryContent = `
+      <a href="${userLinks[currentUsername]}" target="_blank">
+        <img src="./src/images/food.png" alt="Подарок" style="width: 100px; height: 100px;"/>
+      </a>
+    `;
+  } else {
+    victoryContent = `
+      <p style="font-family: 'PixelFont'; color: #333; font-size: 18px;">
+        Упс, похоже, что вашего имени нет в списке пользователей :(.<br>
+		Напишите в телеграм Артёму.
+      </p>
+    `;
+  }
+
   document.body.innerHTML = `
     <div id="victory-screen" style="position: relative; text-align: center; background-color: #add8e6; 
-	width: 100vw; max-width: 100%; height: 100vh; overflow: hidden;">
-      <!-- Изображение солнышка -->
+    width: 100vw; max-width: 100%; height: 100vh; overflow: hidden;">
       <img src="./src/images/sun1.gif" alt="Солнышко" style="position: absolute; top: 10px; right: 10px; width: 150px; height: 150px; z-index: 1;">
-	  <h1 style="font-family: 'PixelFont'; color: pink; text-shadow: 2px 2px 2px black; margin-top: 180px;">
-        Дорогие девушки, поздравляем с 8 марта <3
+	  <!--
+	  <h1 style="font-family: 'PixelFont'; color: pink; text-shadow: 2px 2px black; margin-top: 180px;">
+      -->
+	  <h1 style="font-family: 'PixelFont'; color: pink; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px  1px 0 #000, 1px  1px 0 #000; black; margin-top: 180px;">
+		Дорогие девушки, поздравляем с 8 марта <3
       </h1>
       <p style="font-family: 'PixelFont'; color: #333; font-size: 18px;">
-        Ваш подарок ждёт вас по ссылкам:
+        Ваш подарок ждёт вас:
       </p>
-      <ul style="list-style-type: none; padding: 0; margin-bottom: 30px;">
-        <li><a href="https://example1.com" target="_blank" style="font-family: 'PixelFont'; color: blue; text-decoration: underline;">1. Ссылка1</a></li>
-        <li><a href="https://example2.com" target="_blank" style="font-family: 'PixelFont'; color: blue; text-decoration: underline;">2. Ссылка2</a></li>
-        <li><a href="https://example3.com" target="_blank" style="font-family: 'PixelFont'; color: blue; text-decoration: underline;">3. Ссылка3</a></li>
-      </ul>
+      ${victoryContent}
       <img src="./src/images/grass.png" alt="Трава" style="width: 100%; height: auto; max-height: 130px; position: absolute; bottom: 0; left: 0; z-index: 1">
       <img src="./src/images/rose.png" alt="Роза" style="position: absolute; top: 79%; left: 50%; transform: translate(-50%, -50%) scale(0.3); z-index: 0">
-
-	  <img src="./src/images/flower1.gif" alt="Цветы1" style="position: absolute; bottom: 0.5%; left: 10%; transform: translateX(-50%) scale(0.6); z-index: 2">
-	  <img src="./src/images/flower3.gif" alt="Цветы3" style="position: absolute; bottom: 2.5%; left: 30%; transform: translateX(-50%) scale(0.6); z-index: 0">
-	  <img src="./src/images/flower3.gif" alt="Цветы3" style="position: absolute; bottom: 2.5%; left: 65%; transform: translateX(-50%) scale(0.6); z-index: 0">
+      <img src="./src/images/flower1.gif" alt="Цветы1" style="position: absolute; bottom: 0.5%; left: 10%; transform: translateX(-50%) scale(0.6); z-index: 2">
+      <img src="./src/images/flower3.gif" alt="Цветы3" style="position: absolute; bottom: 2.5%; left: 30%; transform: translateX(-50%) scale(0.6); z-index: 0">
+      <img src="./src/images/flower3.gif" alt="Цветы3" style="position: absolute; bottom: 2.5%; left: 65%; transform: translateX(-50%) scale(0.6); z-index: 0">
 	  <img src="./src/images/flower2.gif" alt="Цветы2" style="position: absolute; bottom: 0.0%; left: 78%; transform: translateX(-50%) scale(0.57); z-index:0;">
-	  <img src="./src/images/tree1.gif" alt="Деревце1" style="position: absolute; bottom: 23%; left: 96%; transform: translateX(-50%) scale(3); z-index: 0">
-
+      <img src="./src/images/tree1.gif" alt="Деревце1" style="position: absolute; bottom: 23%; left: 96%; transform: translateX(-50%) scale(3); z-index: 0">
   `;
 
   // Контейнер для облаков
@@ -207,68 +253,60 @@ function showVictory() {
     cloud.style.top = `${Math.random() * 80 + 20}px`; // Высота 20-100px
     cloud.style.animationDelay = `${Math.random() * 5}s`; // Задержка 0-5s
     cloud.style.animationDuration = `${Math.random() * 5 + 15}s`; // Длительность 15-20s
-    // Рандомный масштаб: от 0.8 до 1.2 (уменьшение или увеличение)
     const randomScale = Math.random() * 0.4 + 0.8; // 0.8 <= scale < 1.2
     cloud.style.transform = `scale(${randomScale})`;
-	cloud.style.zIndex = 10; // Устанавливаем облакам более высокий z-index, чтобы они перекывали солнышко
+    cloud.style.zIndex = 10; 
     cloudContainer.appendChild(cloud);
   }
-
-  // Добавляем CSS
+  
   const style = document.createElement('style');
   style.innerHTML = `
-    /* Общее для всех облаков */
     .cloud {
       position: absolute;
       background-repeat: no-repeat;
       background-size: contain;
       animation: moveClouds linear infinite;
       left: -300px;
-      opacity: 0; /* Для плавного появления */
+      opacity: 0;
     }
 
-    /* Облако 1 */
     .cloud1 {
       width: 150px;
       height: 75px;
       background-image: url('./src/images/cloud1.png');
     }
 
-    /* Облако 2 */
     .cloud2 {
       width: 150px;
       height: 75px;
       background-image: url('./src/images/cloud2.png');
     }
 
-    /* Облако 3 */
     .cloud3 {
       width: 400px;
       height: 200px;
       background-image: url('./src/images/cloud3.gif');
     }
 
-    /* Анимация движения облаков */
     @keyframes moveClouds {
-       0% {
-        left: -300px; / Начало за пределами экрана /
-        opacity: 0; / Полупрозрачность /
+      0% {
+        left: -300px;
+        opacity: 0;
       }
       10% {
-        opacity: 1; / Постепенно становятся видимыми /
+        opacity: 1;
       }
       50% {
-        opacity: 1; / Полностью видимы перед исчезновением /
+        opacity: 1;
       }
       100% {
-        left: 100vw; / Движение за правый край экрана /
-        opacity: 0; / Постепенно исчезают /
-	  }
+        left: 100vw;
+        opacity: 0;
+      }
     }
   `;
   document.head.appendChild(style);
 }
-
 
 // Показ экрана поражения
 function showGameOver() {
@@ -291,7 +329,7 @@ function showGameOver() {
   `;
 }
 
-// Управление
+// Управление с клавиатуры
 window.addEventListener('keydown', (e) => {
   switch (e.code) {
     case 'ArrowUp':
@@ -309,6 +347,45 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-// Старт игры
-placeFood();
-requestAnimationFrame(gameLoop);
+
+// Управление с сенсорного экрана
+// Координаты касания
+let startX = 0;
+let startY = 0;
+
+// Управление с помощью сенсорного экрана
+canvas.addEventListener('touchstart', (e) => {
+  const touch = e.touches[0];
+  startX = touch.clientX;
+  startY = touch.clientY;
+});
+
+canvas.addEventListener('touchmove', (e) => {
+  if (!e.touches.length) return;
+
+  const touch = e.touches[0];
+  const deltaX = touch.clientX - startX;
+  const deltaY = touch.clientY - startY;
+
+  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    if (deltaX > 0 && direction.x === 0) {
+      newDirection = { x: 1, y: 0 }; // Тап вправо
+    } else if (deltaX < 0 && direction.x === 0) {
+      newDirection = { x: -1, y: 0 }; // Тап влево
+    }
+  } else {
+    if (deltaY > 0 && direction.y === 0) {
+      newDirection = { x: 0, y: 1 }; // Тап вниз
+    } else if (deltaY < 0 && direction.y === 0) {
+      newDirection = { x: 0, y: -1 }; // Тап вверх
+    }
+  }
+
+  startX = touch.clientX;
+  startY = touch.clientY;
+  e.preventDefault();
+});
+
+
+// Показываем экран ввода имени пользователя перед началом игры
+showEnterName();

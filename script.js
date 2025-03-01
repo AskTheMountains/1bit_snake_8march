@@ -352,40 +352,34 @@ window.addEventListener('keydown', (e) => {
 
 
 // Управление с сенсорного экрана
-// Координаты касания
-let startX = 0;
-let startY = 0;
+let touchStartX = 0;
+let touchStartY = 0;
 
-// Управление с помощью сенсорного экрана
 canvas.addEventListener('touchstart', (e) => {
   const touch = e.touches[0];
-  startX = touch.clientX;
-  startY = touch.clientY;
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+  e.preventDefault();
 });
 
-canvas.addEventListener('touchmove', (e) => {
-  if (!e.touches.length) return;
-
-  const touch = e.touches[0];
-  const deltaX = touch.clientX - startX;
-  const deltaY = touch.clientY - startY;
+canvas.addEventListener('touchend', (e) => {
+  const touch = e.changedTouches[0];
+  const deltaX = touch.clientX - touchStartX;
+  const deltaY = touch.clientY - touchStartY;
 
   if (Math.abs(deltaX) > Math.abs(deltaY)) {
     if (deltaX > 0 && direction.x === 0) {
-      newDirection = { x: 1, y: 0 }; // Тап вправо
+      newDirection = { x: 1, y: 0 }; // Касание вправо
     } else if (deltaX < 0 && direction.x === 0) {
-      newDirection = { x: -1, y: 0 }; // Тап влево
+      newDirection = { x: -1, y: 0 }; // Касание влево
     }
   } else {
     if (deltaY > 0 && direction.y === 0) {
-      newDirection = { x: 0, y: 1 }; // Тап вниз
+      newDirection = { x: 0, y: 1 }; // Касание вниз
     } else if (deltaY < 0 && direction.y === 0) {
-      newDirection = { x: 0, y: -1 }; // Тап вверх
+      newDirection = { x: 0, y: -1 }; // Касание вверх
     }
   }
-
-  startX = touch.clientX;
-  startY = touch.clientY;
   e.preventDefault();
 });
 

@@ -315,7 +315,7 @@ function showVictory() {
           Дорогие девушки, поздравляем с 8 марта <3
         </h1>
         <p style="font-family: 'PixelFont'; color: #333; font-size: 18px; margin: 10px 0;">
-          Ваш подарок ждёт вас:
+          Ваш подарок ждёт вас по ссылке:
         </p>
         ${victoryContent}
       </div>

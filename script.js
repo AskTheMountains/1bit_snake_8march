@@ -30,7 +30,7 @@ let food = { x: 5, y: 5 };
 let speed = 20;
 
 // Логика для выигрыша
-const victoryLength = 3;
+const victoryLength = 5;
 
 // Счётчик времени
 let frame = 0;

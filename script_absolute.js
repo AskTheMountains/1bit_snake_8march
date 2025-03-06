@@ -29,21 +29,49 @@ let newDirection = { x: 0, y: 0 };
 let food = { x: 5, y: 5 };
 let speed = 20;
 
+// Загружаем звуки поедания еды
+const eatingSounds = [
+  new Audio('./src/sounds/eat1.wav'),
+  new Audio('./src/sounds/eat3.wav'),
+  new Audio('./src/sounds/eat4.wav'),
+  new Audio('./src/sounds/eat5.wav'),
+  new Audio('./src/sounds/eat6.wav'),
+  new Audio('./src/sounds/eat7.wav'),
+  new Audio('./src/sounds/eat8.wav'),
+  new Audio('./src/sounds/eat9.wav')
+];
+
+
+// Звук кнопки
+const buttonSound = new Audio('./src/sounds/button.wav');
+// Звук при клике на изображение подарка
+const giftSound = new Audio('./src/sounds/eat8.wav'); 
+// Звук при проигрыше
+const gameOverSound = new Audio('./src/sounds/game_over1.wav'); 
+
 // Логика для выигрыша
-const victoryLength = 1;
+const victoryLength = 15;
 
 // Счётчик времени
 let frame = 0;
 
 // Список пользователей и соответствующих им ссылок
 const userLinks = {
-  "User1": "https://example1.com",
-  "User2": "https://example2.com",
-  "User3": "https://example3.com"
+  "Mariya_Marchenko_1": "https://ga.gift/ru/88680378815545b184c826580e62f550", // https://goldapple.ru/cards/receive/88680378815545b184c826580e62f550?from=whatsapp
+  "Annaakasymova": "https://ga.gift/ru/701dc4eb9b5a442685b3ff17d81c804a",  // https://goldapple.ru/cards/receive/701dc4eb9b5a442685b3ff17d81c804a?from=whatsapp 
+  "happiness_easy": "https://ga.gift/ru/88680378815545b184c826580e62f550"
 };
 
 // Переменная для хранения текущего имени пользователя
 let currentUsername = '';
+
+
+// Функция для воспроизведения случайного звука поедания еды
+function playRandomEatingSound() {
+    const randomIndex = Math.floor(Math.random() * eatingSounds.length);
+    const sound = new Audio(eatingSounds[randomIndex].src); // Создаём новый объект Audio для параллельного воспроизведения
+    sound.play();
+}
 
 // Функция старта игры
 function gameLoop() {
@@ -70,12 +98,14 @@ function update() {
 
   // Проверка выхода за границы
   if (head.x < 0 || head.y < 0 || head.x >= tileCount || head.y >= tileCount) {
+	gameOverSound.play()
     return false; 
   }
 
   // Проверка столкновения с телом
   for (let i = 1; i < snake.length; i++) {
     if (head.x === snake[i].x && head.y === snake[i].y) {
+	  gameOverSound.play()
       return false;
     }
   }
@@ -85,6 +115,7 @@ function update() {
 
   if (head.x === food.x && head.y === food.y) {
     placeFood();
+	playRandomEatingSound(); // Воспроизведение звука поедания
   } else {
     snake.pop();
   }
@@ -218,10 +249,10 @@ function showEnterName() {
     <div id="name-entry-container" style="display: flex; flex-direction: column; justify-content: center; align-items: center; 
       position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #444444; color: white;">
       <h1 style="font-family: 'PixelFont'; font-size: 2em; color: #ffffff; text-shadow: 3px 3px 3px black; margin-bottom: 20px;">
-        Введите ваше имя пользователя Telegramm
+        Введите ваше имя пользователя Telegramm (без @)
       </h1>
       <input id="username-input" type="text" style="font-size: 1em; padding: 10px; width: 300px; margin-bottom: 20px;" placeholder="Имя пользователя Telegramm">
-      <button onclick="initializeGame()" style="font-family: 'PixelFont'; font-size: 1.2em; padding: 10px 20px; 
+      <button id="start-game-button" onclick="initializeGame()" style="font-family: 'PixelFont'; font-size: 1.2em; padding: 10px 20px; 
         background-color: #ff4d4d; color: white; border: none; cursor: pointer; border-radius: 5px;">
         Начать игру
       </button>
@@ -229,6 +260,17 @@ function showEnterName() {
         style="position: absolute; top: 50px; left: 50%; transform: translateX(-50%) scaleX(-1); width: 300px; opacity: 0.8;">
     </div>
   `;
+  
+  // Воспроизведение звука при нажатии кнопки начать игру
+  const startGameButton = document.getElementById('start-game-button');
+  
+  startGameButton.addEventListener('click', () => {
+    buttonSound.play(); // Воспроизведение звука
+  });
+
+  startGameButton.addEventListener('click', () => {
+    initializeGame(); // Запуск игры
+  });
 }
 
 // Установка холста
@@ -253,41 +295,50 @@ function showVictory() {
   if (userLinks[currentUsername]) {
     victoryContent = `
       <a href="${userLinks[currentUsername]}" target="_blank">
-        <img src="./src/images/food.png" alt="Подарок" style="width: 100px; height: 100px;"/>
+        <img id="gift-image" src="./src/images/food.png" alt="Подарок" style="width: 100px; height: 100px;"/>
       </a>
     `;
   } else {
     victoryContent = `
       <p style="font-family: 'PixelFont'; color: #333; font-size: 18px;">
         Упс, похоже, что вашего имени нет в списке пользователей :(<br>
-		Напишите в телеграм Артёму
+        Напишите в телеграм Артёму
       </p>
     `;
   }
 
   document.body.innerHTML = `
-  <div id="victory-screen" style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; background-color: #add8e6; width: 100vw; height: 100vh; overflow: hidden; position: relative;">
-    <div style="position: relative; width: 100%; flex-grow: 1; margin-top: 20px;">
-      <img src="./src/images/sun1.gif" alt="Солнышко" style="position: absolute; top: 10px; right: 10px; width: 150px; height: 150px; z-index: 1;">
-      <h1 style="font-family: 'PixelFont'; color: pink; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px  1px 0 #000, 1px  1px 0 #000; margin: 0; padding-top: 200px;">
-        Дорогие девушки, поздравляем с 8 марта <3
-      </h1>
-      <p style="font-family: 'PixelFont'; color: #333; font-size: 18px; margin: 10px 0;">
-        Ваш подарок ждёт вас:
-      </p>
-      ${victoryContent}
+    <div id="victory-screen" style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; background-color: #add8e6; width: 100vw; height: 100vh; overflow: hidden; position: relative;">
+      <div style="position: relative; width: 100%; flex-grow: 1; margin-top: 20px;">
+        <img src="./src/images/sun1.gif" alt="Солнышко" style="position: absolute; top: 10px; right: 10px; width: 150px; height: 150px; z-index: 1;">
+        <h1 style="font-family: 'PixelFont'; color: pink; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px  1px 0 #000, 1px  1px 0 #000; margin: 0; padding-top: 200px;">
+          Дорогие девушки, поздравляем с 8 марта <3
+        </h1>
+        <p style="font-family: 'PixelFont'; color: #333; font-size: 18px; margin: 10px 0;">
+          Ваш подарок ждёт вас:
+        </p>
+        ${victoryContent}
+      </div>
+      <div style="position: relative; width: 100%; height: 130px; flex-shrink: 0;">
+        <img src="./src/images/grass.png" alt="Трава" style="width: 100%; height: 100%; position: absolute; bottom: 0; left: 0; z-index: 1">
+        <img src="./src/images/rose.png" alt="Роза" style="position: absolute; bottom: -260%; left: 50%; transform: translateX(-50%) scale(0.25); z-index: 0;">
+        <img src="./src/images/flower1.gif" alt="Цветы1" style="position: absolute; bottom: 0.5%; left: 10%; transform: translateX(-50%) scale(0.6); z-index: 2;">
+        <img src="./src/images/flower3.gif" alt="Цветы3" style="position: absolute; bottom: 15%; left: 33%; transform: translateX(-50%) scale(0.6); z-index: 0;">
+        <img src="./src/images/flower3.gif" alt="Цветы3" style="position: absolute; bottom: 15%; left: 65%; transform: translateX(-50%) scale(0.6); z-index: 0;">
+        <img src="./src/images/flower2.gif" alt="Цветы2" style="position: absolute; bottom: 0.0%; left: 78%; transform: translateX(-50%) scale(0.57); z-index:0;">
+        <img src="./src/images/tree1.gif" alt="Деревце1" style="position: absolute; bottom: 145%; left: 95%; transform: translateX(-50%) scale(3); z-index: 0;">
+      </div>
     </div>
-    <div style="position: relative; width: 100%; height: 130px; flex-shrink: 0;">
-      <img src="./src/images/grass.png" alt="Трава" style="width: 100%; height: 100%; position: absolute; bottom: 0; left: 0; z-index: 1">
-      <img src="./src/images/rose.png" alt="Роза" style="position: absolute; bottom: -260%; left: 50%; transform: translateX(-50%) scale(0.25); z-index: 0;">
-      <img src="./src/images/flower1.gif" alt="Цветы1" style="position: absolute; bottom: 0.5%; left: 10%; transform: translateX(-50%) scale(0.6); z-index: 2;">
-      <img src="./src/images/flower3.gif" alt="Цветы3" style="position: absolute; bottom: 15%; left: 33%; transform: translateX(-50%) scale(0.6); z-index: 0;">
-      <img src="./src/images/flower3.gif" alt="Цветы3" style="position: absolute; bottom: 15%; left: 65%; transform: translateX(-50%) scale(0.6); z-index: 0;">
-      <img src="./src/images/flower2.gif" alt="Цветы2" style="position: absolute; bottom: 0.0%; left: 78%; transform: translateX(-50%) scale(0.57); z-index:0;">
-      <img src="./src/images/tree1.gif" alt="Деревце1" style="position: absolute; bottom: 145%; left: 95%; transform: translateX(-50%) scale(3); z-index: 0;">
-    </div>
-  </div>
   `;
+   
+  // Воспроизведение звука при нажатии на кнопку подарка
+  const giftImage = document.getElementById('gift-image');
+  if (giftImage) {
+    giftImage.addEventListener('click', () => { // Событие по клику
+      giftSound.play(); // Воспроизводим звук
+    });
+  }
+
 
 // Контейнер для облаков
 const cloudContainer = document.getElementById('victory-screen');
@@ -380,7 +431,7 @@ function showGameOver() {
         Я в вас верю, у вас обязательно получится!
       </p>
       <input id="new-username-input" type="text" value="${currentUsername}" style="font-size: 1.5em; padding: 10px; width: 300px; margin-top: 20px;" placeholder="Введите ваше имя">
-      <button onclick="restartGame()" style="font-family: 'PixelFont'; font-size: 1.2em; padding: 10px 20px; 
+      <button id="restart-game-button" onclick="restartGame()" style="font-family: 'PixelFont'; font-size: 1.2em; padding: 10px 20px; 
         background-color: #ff4d4d; color: white; border: none; cursor: pointer; border-radius: 5px; margin-top: 20px;">
         Играть снова
       </button>
@@ -388,6 +439,17 @@ function showGameOver() {
         style="position: absolute; top: 50px; left: 50%; transform: translateX(-50%); width: 200px; opacity: 0.8;">
     </div>
   `;
+  
+   // Воспроизведение звука при нажатии кнопки начать игру
+  const startGameButton = document.getElementById('restart-game-button');
+  
+  startGameButton.addEventListener('click', () => {
+    buttonSound.play(); // Воспроизведение звука
+  });
+
+  startGameButton.addEventListener('click', () => {
+    restartGame(); // Запуск игры
+  });
 }
 
 

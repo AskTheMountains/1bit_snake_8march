@@ -345,7 +345,7 @@ function showVictory() {
     </div>
   `;
   
-  document.getElementById('controls').classList.add('hidden'); // Скрываем инструкции по управению
+  //document.getElementById('controls').classList.add('hidden'); // Скрываем инструкции по управению
   // Воспроизведение звука при нажатии на кнопку подарка
   const giftImage = document.getElementById('gift-image');
   if (giftImage) {

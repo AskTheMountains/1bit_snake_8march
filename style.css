@@ -5,31 +5,42 @@
   font-style: normal;
   font-weight: normal;
 }
+
 /* Общие стили для страницы */
-body {
-  font-family: 'PixelFont', sans-serif; /* Подключаем шрифт */
+body, html {
+  height: 100%; /* Важно для родителей flexbox */
   margin: 0;
   padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
   background-color: #f0f0f0;
 }
 
-/* Контейнер для игры */
-#game-container {
-  text-align: center;
+#container {
+  display: flex;
+  flex-direction: column; /* Вертикальное расположение элементов */
+  justify-content: center;
+  align-items: center; /* Центрирование по горизонтали */
+  min-height: 100vh; /* Полный экран */
 }
 
-/* Игровое поле */
+#game-container {
+  display: flex;
+  justify-content: center;
+}
+
 #game-canvas {
   display: block;
-  background-color: #eaeaea; /* Светло-серый фон */
-  border: 1px solid #000; /* Чёрная рамка вокруг игрового поля */
+  background-color: #eaeaea;
+  border: 1px solid #000;
 }
 
-/* Инструкции под игрой */
 #controls {
-  margin-top: 10px;
+  margin-top: 20px;
+  text-align: center;
+  font-family: 'PixelFont', sans-serif; /* Подключаем шрифт */
+}
+
+
+/* Класс для скрытия элементов */
+.hidden {
+  display: none;
 }

@@ -59,7 +59,7 @@ let frame = 0;
 const userLinks = {
   "Mariya_Marchenko_1": "https://ga.gift/ru/88680378815545b184c826580e62f550", // https://goldapple.ru/cards/receive/88680378815545b184c826580e62f550?from=whatsapp
   "Annaakasymova": "https://ga.gift/ru/701dc4eb9b5a442685b3ff17d81c804a",  // https://goldapple.ru/cards/receive/701dc4eb9b5a442685b3ff17d81c804a?from=whatsapp 
-  "happiness_easy": "https://ga.gift/ru/88680378815545b184c826580e62f550"
+  "happiness_easy": "https://ga.gift/ru/fd86f44d86884e46bffaf4d9aeb4853e"
 };
 
 // Переменная для хранения текущего имени пользователя
@@ -181,21 +181,34 @@ function placeFood() {
 
 // Управление с клавиатуры
 window.addEventListener('keydown', (e) => {
-  switch (e.code) {
-    case 'ArrowUp':
+  if (!e.key) return; // Если e.key отсутствует, то просто возвращаемся
+
+  const key = e.key.toLowerCase();
+  
+  switch (key) {
+    case 'arrowup':
+    case 'w':
+    case 'ц':  // Русская клавиша для "w"
       if (direction.y === 0) newDirection = { x: 0, y: -1 };
       break;
-    case 'ArrowDown':
+    case 'arrowdown':
+    case 's':
+    case 'ы':  // Русская клавиша для "s"
       if (direction.y === 0) newDirection = { x: 0, y: 1 };
       break;
-    case 'ArrowLeft':
+    case 'arrowleft':
+    case 'a':
+    case 'ф':  // Русская клавиша для "a"
       if (direction.x === 0) newDirection = { x: -1, y: 0 };
       break;
-    case 'ArrowRight':
+    case 'arrowright':
+    case 'd':  
+    case 'в':  // Русская клавиша для "d"
       if (direction.x === 0) newDirection = { x: 1, y: 0 };
       break;
   }
 });
+
 
 // Управление с помощью сенсорного экрана
 let touchStartX = 0;
@@ -236,49 +249,50 @@ function initializeGame() {
     currentUsername = usernameInput.value.trim() || currentUsername;
     if (currentUsername) {
       setupCanvas();
-      requestAnimationFrame(gameLoop);  
+      document.getElementById('controls').classList.remove('hidden'); // Показываем инструкции
+      requestAnimationFrame(gameLoop);
     } else {
       alert('Пожалуйста, введите ваш никнейм, чтобы продолжить');
     }
   }
 }
 
+// Установка холста
+function setupCanvas() {
+  const gameContainer = document.getElementById('game-container');
+  gameContainer.innerHTML = '';
+  gameContainer.appendChild(canvas);
+  resetGame();
+}
+
+
 // Экран ввода имени
 function showEnterName() {
-  document.body.innerHTML = `
-    <div id="name-entry-container" style="display: flex; flex-direction: column; justify-content: center; align-items: center; 
+  const gameContainer = document.getElementById('game-container');
+  gameContainer.innerHTML = `
+    <div id="name-entry-container" style="display: flex; flex-direction: column; justify-content: center; align-items: center;
       position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #444444; color: white;">
       <h1 style="font-family: 'PixelFont'; font-size: 2em; color: #ffffff; text-shadow: 3px 3px 3px black; margin-bottom: 20px;">
         Введите ваше имя пользователя Telegramm (без @)
       </h1>
       <input id="username-input" type="text" style="font-size: 1em; padding: 10px; width: 300px; margin-bottom: 20px;" placeholder="Имя пользователя Telegramm">
-      <button id="start-game-button" onclick="initializeGame()" style="font-family: 'PixelFont'; font-size: 1.2em; padding: 10px 20px; 
+      <button id="start-game-button" style="font-family: 'PixelFont'; font-size: 1.2em; padding: 10px 20px;
         background-color: #ff4d4d; color: white; border: none; cursor: pointer; border-radius: 5px;">
         Начать игру
       </button>
-      <img src="./src/images/snake_title5.gif" alt="Змейка при вводе никнейма" 
+      <img src="./src/images/snake_title5.gif" alt="Змейка при вводе никнейма"
         style="position: absolute; top: 50px; left: 50%; transform: translateX(-50%) scaleX(-1); width: 300px; opacity: 0.8;">
     </div>
   `;
-  
-  // Воспроизведение звука при нажатии кнопки начать игру
+  document.getElementById('controls').classList.add('hidden'); // Скрываем инструкции по управлению
   const startGameButton = document.getElementById('start-game-button');
-  
   startGameButton.addEventListener('click', () => {
     buttonSound.play(); // Воспроизведение звука
-  });
-
-  startGameButton.addEventListener('click', () => {
     initializeGame(); // Запуск игры
   });
 }
 
-// Установка холста
-function setupCanvas() {
-  document.body.innerHTML = ``;
-  document.body.appendChild(canvas);
-  resetGame();
-}
+
 
 // Сброс игры
 function resetGame() {
@@ -330,7 +344,8 @@ function showVictory() {
       </div>
     </div>
   `;
-   
+  
+  document.getElementById('controls').classList.add('hidden'); // Скрываем инструкции по управению
   // Воспроизведение звука при нажатии на кнопку подарка
   const giftImage = document.getElementById('gift-image');
   if (giftImage) {
@@ -421,7 +436,8 @@ document.head.appendChild(style);
 
 // Экран поражения с возможностью изменения имени пользователя
 function showGameOver() {
-  document.body.innerHTML = `
+  const gameContainer = document.getElementById('game-container');
+  gameContainer.innerHTML = `
     <div id="game-over-container" style="display: flex; flex-direction: column; justify-content: center; align-items: center; 
     position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #333333; color: white;">
       <h1 style="font-family: 'PixelFont'; font-size: 1.7em; color: #ff4d4d; text-shadow: 3px 3px 3px black; margin-bottom: 20px;">
@@ -431,7 +447,7 @@ function showGameOver() {
         Я в вас верю, у вас обязательно получится!
       </p>
       <input id="new-username-input" type="text" value="${currentUsername}" style="font-size: 1.5em; padding: 10px; width: 300px; margin-top: 20px;" placeholder="Введите ваше имя">
-      <button id="restart-game-button" onclick="restartGame()" style="font-family: 'PixelFont'; font-size: 1.2em; padding: 10px 20px; 
+      <button id="restart-game-button" style="font-family: 'PixelFont'; font-size: 1.2em; padding: 10px 20px; 
         background-color: #ff4d4d; color: white; border: none; cursor: pointer; border-radius: 5px; margin-top: 20px;">
         Играть снова
       </button>
@@ -440,27 +456,22 @@ function showGameOver() {
     </div>
   `;
   
-   // Воспроизведение звука при нажатии кнопки начать игру
-  const startGameButton = document.getElementById('restart-game-button');
-  
-  startGameButton.addEventListener('click', () => {
+  document.getElementById('controls').classList.add('hidden'); // Скрываем инструкции по управлению
+  const restartGameButton = document.getElementById('restart-game-button');
+  restartGameButton.addEventListener('click', () => {
     buttonSound.play(); // Воспроизведение звука
-  });
-
-  startGameButton.addEventListener('click', () => {
     restartGame(); // Запуск игры
   });
 }
 
-
-// Перезапуск игры при нажатии на "Играть снова"
 function restartGame() {
-  const newUsernameInput = document.getElementById('new-username-input');
-  if (newUsernameInput) {
-    currentUsername = newUsernameInput.value.trim() || currentUsername;
-    setupCanvas(); // Переносим сюда, чтобы канвас всегда обновлялся
-    requestAnimationFrame(gameLoop); // Запуск игрового цикла
-  }
+  const newUsernameInput = document.getElementById('new-username-input').value.trim();
+  currentUsername = newUsernameInput || currentUsername; // Обновляем имя пользователя, если введено новое
+  setupCanvas();
+  document.getElementById('controls').classList.remove('hidden'); // Показываем инструкции снова
+  requestAnimationFrame(gameLoop); // Запуск игрового цикла
 }
+
+
 // Запуск игры с экрана ввода имени
 showEnterName();
